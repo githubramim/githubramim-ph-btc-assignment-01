@@ -28,3 +28,7 @@
 💻 Source Code: https://github.com/githubramim/githubramim-ph-btc-assignment-01
 
 #WebDevelopment #ProgrammingHero #CareerIO #HTML #CSS #JavaScript #GitHubPages #CodingJourney #FrontendDevelopment #LearningByDoing
+
+
+
+<p align="left"> <img src="responsive.png"/> </p>
