@@ -3,153 +3,961 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Responsive Portfolio</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon">
+    <title>GitHub Link Converter with User Info</title>
+
+    <!-- Bootstrap CSS -->
     <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Comic+Relief:wght@400;700&display=swap"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+
+    <!-- Toastr CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon" />
+
+    <!-- QR Code lib -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+    <style>
+      :root {
+        --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        --dark-gradient: linear-gradient(135deg, #141414 0%, #3a3a3a 100%);
+        --text-light: #fff;
+        --text-dark: #ddd;
+        --btn-gradient: linear-gradient(
+          270deg,
+          #ff004c,
+          #f9cb28,
+          #00f0ff,
+          #ff004c
+        );
+        --btn-gradient-hover: linear-gradient(
+          270deg,
+          #00f0ff,
+          #f9cb28,
+          #ff004c,
+          #00f0ff
+        );
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        background: var(--primary-gradient);
+        color: var(--text-light);
+        transition: background 0.4s ease, color 0.4s ease;
+        display: flex;
+        flex-direction: column;
+      }
+
+      body.dark {
+        background: var(--dark-gradient);
+        color: var(--text-dark);
+      }
+
+      nav.navbar {
+        background: rgba(0, 0, 0, 0.25);
+        padding: 0.5rem 1.5rem;
+        backdrop-filter: saturate(180%) blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--text-light);
+        user-select: none;
+        flex-wrap: wrap;
+        z-index: 1000;
+      }
+
+      nav .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        letter-spacing: 1.3px;
+        cursor: default;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      nav .navbar-brand img {
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        filter: drop-shadow(0 0 3px #00f0ff);
+      }
+
+      nav .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      select,
+      button.theme-toggle {
+        border-radius: 50px;
+        padding: 0.4rem 1rem;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease, color 0.3s ease;
+        background: rgba(255 255 255 / 0.15);
+        color: var(--text-light);
+        user-select: none;
+        min-width: 110px;
+        text-align: center;
+        box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+      }
+
+      select:hover,
+      button.theme-toggle:hover {
+        background: rgba(255 255 255 / 0.3);
+        color: #00f0ff;
+        box-shadow: 0 0 12px #00f0ff;
+      }
+
+      body.dark select,
+      body.dark button.theme-toggle {
+        background: rgba(0 0 0 / 0.2);
+        color: var(--text-dark);
+        box-shadow: 0 0 6px rgba(255 255 255, 0.15);
+      }
+
+      main.container {
+        flex-grow: 1;
+        max-width: 900px;
+        margin: 2rem auto 3rem;
+        background: rgba(255 255 255 / 0.1);
+        border-radius: 15px;
+        padding: 2rem 2.5rem;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        backdrop-filter: saturate(150%) blur(5px);
+        animation: fadeInUp 1s ease forwards;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        color: var(--text-light);
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      label {
+        font-weight: 700;
+        font-size: 1.2rem;
+      }
+
+      textarea#inputLinks {
+        width: 100%;
+        min-height: 100px;
+        border-radius: 12px;
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border: none;
+        outline: none;
+        resize: vertical;
+        background: rgba(255 255 255 / 0.15);
+        color: var(--text-light);
+        box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.3);
+        transition: background 0.3s ease;
+      }
+
+      body.dark textarea#inputLinks {
+        background: rgba(0 0 0 / 0.3);
+        color: var(--text-dark);
+      }
+
+      textarea#inputLinks::placeholder {
+        color: #a0a0a0;
+      }
+
+      .btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: start;
+      }
+
+      .btn-row button {
+        min-width: 160px;
+        padding: 0.8rem 1.8rem;
+        font-weight: 700;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        color: var(--text-light);
+        background-image: var(--btn-gradient);
+        background-size: 400% 400%;
+        animation: gradientAnimation 8s ease infinite;
+        transition: box-shadow 0.3s ease;
+        user-select: none;
+        box-shadow: 0 0 10px #00f0ff;
+        flex-grow: 1;
+        max-width: 250px;
+      }
+
+      .btn-row button:hover {
+        background-image: var(--btn-gradient-hover);
+        box-shadow: 0 0 20px #00f0ff;
+      }
+
+      @keyframes gradientAnimation {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      #output {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-height: 360px;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 15px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: inset 0 0 12px #00f0ff;
+        font-weight: 600;
+        color: var(--text-light);
+        scroll-behavior: smooth;
+      }
+
+      .link-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 1rem;
+        border-bottom: 1px solid rgba(255 255 255 / 0.1);
+        padding-bottom: 0.6rem;
+        animation: fadeIn 0.5s ease forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .link-left {
+        flex: 1 1 60%;
+        min-width: 200px;
+      }
+
+      .link-left a {
+        color: #f9cb28;
+        font-weight: 700;
+        word-break: break-word;
+        text-decoration: underline;
+        font-size: 1.05rem;
+        transition: color 0.3s ease;
+      }
+      .link-left a:hover {
+        color: #00f0ff;
+      }
+
+      .preview-info {
+        font-size: 0.85rem;
+        margin-top: 3px;
+        color: #a0d8ff;
+        font-style: italic;
+        user-select: none;
+      }
+
+      .copy-btn {
+        background: #00aaff;
+        border: none;
+        padding: 0.4rem 1.2rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        flex-shrink: 0;
+        box-shadow: 0 0 8px #00aaff;
+        transition: background 0.3s ease;
+        user-select: none;
+        font-size: 0.95rem;
+        height: fit-content;
+        align-self: flex-start;
+      }
+
+      .copy-btn:hover {
+        background: #0077cc;
+        box-shadow: 0 0 14px #0077cc;
+      }
+
+      #qr-container {
+        max-width: 100px;
+        max-height: 100px;
+        margin-left: 1rem;
+        flex-shrink: 0;
+        user-select: none;
+        align-self: flex-start;
+      }
+      .qr-canvas {
+        width: 100% !important;
+        height: auto !important;
+        border-radius: 10px;
+        box-shadow: 0 0 8px #00f0ff;
+        transition: box-shadow 0.3s ease;
+      }
+      .qr-canvas:hover {
+        box-shadow: 0 0 16px #00f0ff;
+      }
+
+      #userGuide {
+        background: rgba(0, 0, 0, 0.25);
+        padding: 1rem 1.2rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        color: #a0d8ff;
+        line-height: 1.5;
+        user-select: none;
+        box-shadow: inset 0 0 12px #00bfff;
+        animation: fadeIn 1s ease forwards;
+      }
+      #userGuide strong {
+        color: #f9cb28;
+      }
+
+      /* User info box below link */
+      .user-info {
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(0, 0, 0, 0.15);
+        padding: 8px 12px;
+        border-radius: 8px;
+        color: #00f0ff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        user-select: none;
+      }
+      .user-info img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #00f0ff;
+        flex-shrink: 0;
+      }
+      .user-info div {
+        display: flex;
+        flex-direction: column;
+      }
+      .user-info strong {
+        font-size: 1.05rem;
+        color: #00bfff;
+      }
+      .user-info small {
+        font-style: italic;
+        color: #99ddff;
+        margin-top: 2px;
+      }
+
+      footer {
+        background: linear-gradient(90deg, #ff416c, #ff4b2b);
+        color: white;
+        user-select: none;
+        font-weight: 600;
+        box-shadow: 0 -3px 15px rgba(255, 75, 43, 0.7);
+        font-size: 1rem;
+        letter-spacing: 0.6px;
+        transition: background 0.5s ease;
+        padding: 1rem 0;
+      }
+
+      .footer-content {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 0 1.5rem;
+        gap: 0.5rem;
+      }
+
+      .footer-left {
+        font-size: 1rem;
+      }
+
+      .footer-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: 1rem;
+      }
+
+      .footer-right a {
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.3s ease;
+      }
+
+      .footer-right a i {
+        font-size: 1.3rem;
+        transition: transform 0.3s ease;
+      }
+
+      .footer-right a:hover {
+        color: #ffd54f;
+        text-decoration: underline;
+      }
+
+      .footer-right a:hover i {
+        transform: scale(1.2);
+      }
+
+      @media (max-width: 576px) {
+        .footer-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 0.7rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        nav.navbar {
+          justify-content: center;
+        }
+        .btn-row {
+          justify-content: center !important;
+        }
+        .btn-row button {
+          max-width: 100%;
+          flex-grow: 1;
+        }
+        .link-left {
+          flex-basis: 100%;
+        }
+        #qr-container {
+          margin-left: 0;
+          margin-top: 0.75rem;
+          max-width: 80px;
+          max-height: 80px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <header>
-      <div class="logo">Career<span>.io</span></div>
-      <button onclick="downloadPDF()" class="btn-resume">
-        Download Resume
-      </button>
-    </header>
+    <!-- Navbar -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+      <div class="navbar-brand">
+        <img src="./assets/favicon.ico" alt="Logo" />
+        GitHub Link Converter
+      </div>
 
-    <div class="container">
-      <img src="./assets/hero-developer.png" alt="Developer Icon" />
-      <h1>"In 2025, I hope to become a Full Stack Developer. Insha Allah"</h1>
-      <p>
-        My name is Tanvir Bin Faruk Ramim, and I am a student of Cox's Bazar
-        Polytechnic Institute. Also I'm currentlt working as Lab Assistant of
-        Web Development Trade (ubder NSDA). Rest of the details in the Top-right
-        corner's Download Resume button
-      </p>
-      <a
-        href="https://wa.me/message/IPLOYGXIWYLNO1"
-        target="_blank"
-        class="btn_wp_connect"
-        >Let’s Connect On WhatsApp</a
+      <div class="nav-controls" role="region" aria-label="Controls">
+        <select
+          id="langSelect"
+          aria-label="Select Language"
+          title="Select Language"
+        >
+          <option value="en" selected>English</option>
+          <option value="bn">বাংলা</option>
+        </select>
+
+        <button
+          id="themeToggle"
+          class="theme-toggle"
+          aria-label="Toggle Light/Dark Theme"
+          title="Toggle Light/Dark Theme"
+        >
+          🌙
+        </button>
+
+        <a
+          href="https://github.com/githubramim"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn btn-outline-info"
+          style="min-width: 120px; font-weight: 600"
+        >
+          My GitHub
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="container" role="main" aria-live="polite" aria-atomic="true">
+      <label id="inputLabel" for="inputLinks"
+        >Enter GitHub Repository or Live Links (use comma for multiple
+        link):</label
       >
-    </div>
+      <textarea
+        id="inputLinks"
+        placeholder="e.g. https://github.com/username/repo1, https://username.github.io/repo2/"
+        aria-describedby="userGuide"
+      ></textarea>
 
-    <section class="why-web-dev">
-      <h2>Why Web Development??</h2>
-      <p>
-        Web development is a field that allows me to combine my creativity with
-        technical skills. It offers endless opportunities for innovation and
-        problem-solving, making it an exciting career choice.
-      </p>
-    </section>
-
-    <section class="info-section">
-      <div class="info-text">
-        <h3>I will Do Coding and Change The World</h3>
-        <p>
-          Web development is not just about writing code; it's about creating
-          solutions that can impact people's lives. I am passionate about
-          building applications that are user-friendly and accessible to
-          everyone.
-        </p>
-        <p>
-          My goal is to develop skills in both front-end and back-end
-          technologies, enabling me to create complete web applications that are
-          efficient and scalable.
-        </p>
-        <button class="btn-discuss">Let’s Discuss</button>
+      <div class="btn-row">
+        <button id="convertBtn" type="button">Convert Links</button>
+        <button id="swapBtn" type="button">Swap Repo/Live</button>
+        <button id="downloadCsvBtn" type="button">
+          Download Converted Links as CSV
+        </button>
       </div>
-      <div class="info-image">
-        <img src="./assets/working-developer.png" alt="Coding Illustration" />
-      </div>
-    </section>
 
-    <section class="inspiration-section">
-      <h3>My Inspiration</h3>
-      <p>
-        My inspiration comes from the ever-evolving world of technology and the
-        impact it has on society. I am motivated by the idea of creating
-        applications that can solve real-world problems and improve people's
-        lives.
-      </p>
-      <iframe
-        src="https://www.youtube.com/embed/Ag3zMEJtHAA?si=2wviygZOIEZKssa4"
-        title="YouTube video player"
-        frameborder="0"
-        allowfullscreen
-      ></iframe>
-    </section>
+      <section id="output" aria-label="Converted links output"></section>
+    </main>
 
-    <section class="current-target">
-      <h3>My Current Target</h3>
-      <p>
-        My current target is to master the skills required for full-stack
-        development. I am focusing on learning HTML, CSS, JavaScript, and
-        various frameworks to build dynamic and responsive web applications. I
-        am also working on improving my problem-solving skills and understanding
-        of algorithms, which are essential for any developer.
-      </p>
-      <div class="cards">
-        <div class="card">
-          <img src="./assets/html-icon.png" alt="HTML Logo" />
-          <h4>HTML</h4>
-          <a
-            href="https://www.w3schools.com/html/"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Learn More</a
-          >
-        </div>
-        <div class="card">
-          <img src="./assets/css-icon.png" alt="CSS Logo" />
-          <h4>CSS</h4>
-          <a
-            href="https://www.w3schools.com/css/default.asp"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Learn More</a
-          >
-        </div>
-        <div class="card">
-          <img src="./assets/tailwind-icon.png" alt="Tailwind Logo" />
-          <h4>Tailwind</h4>
-          <a
-            href="https://tailwindcss.com/docs/installation/using-vite"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Learn More</a
-          >
-        </div>
-      </div>
-    </section>
+    <center id="userGuide" aria-live="polite" aria-atomic="true">
+      <strong>How to use:</strong>
+      <ul style="list-style: none">
+        <li>
+          Paste one or multiple GitHub repo or live links separated by commas.
+        </li>
+        <li>Click "Convert Links" to generate the corresponding links.</li>
+        <li>Use "Swap Repo/Live" to switch conversion direction.</li>
+        <li>
+          After conversion, you can download all converted links as a CSV file.
+        </li>
+        <li>Click "Copy" button next to any link to copy it.</li>
+        <li>
+          Use the theme toggle and language selector at the top for preferences.
+        </li>
+      </ul>
+    </center>
 
+    <!-- Footer -->
     <footer>
-      <div class="container-footer">
-        <div class="copyright">
-          An Open Commitment by Tanvir Bin Faruk Ramim
+      <div class="footer-content container">
+        <div class="footer-left">
+          Developed by <strong>Tanvir Bin Faruk Ramim</strong>
         </div>
-        <div class="social-icons">
-          <a target="_blank" href="https://www.facebook.com/TanvirRamimDM/">
-            <i class="fab fa-facebook"></i>
+        <div class="footer-right">
+          Connect on
+          <a
+            href="https://github.com/githubramim"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            class="footer-link"
+          >
+            <i class="bi bi-github"></i> GitHub
           </a>
-          <a target="_blank" href="https://github.com/githubramim">
-            <i class="fab fa-github"></i>
+          |
+          <a
+            href="https://www.linkedin.com/in/ramimhere"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            class="footer-link"
+          >
+            <i class="bi bi-linkedin"></i> LinkedIn
           </a>
-          <a target="_blank" href="https://www.linkedin.com/in/ramimhere/">
-            <i class="fab fa-linkedin"></i>
+          |
+          <a
+            href="https://facebook.com/TanvirRamimDM"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Twitter"
+            class="footer-link"
+          >
+            <i class="bi bi-facebook"></i> Facebook
+          </a>
+          <a
+            href="https://wa.me/message/IPLOYGXIWYLNO1"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Twitter"
+            class="footer-link"
+          >
+            <i class="bi bi-whatsapp"></i> Whatsapp
           </a>
         </div>
       </div>
     </footer>
 
-    <script src="./js/script.js"></script>
+    <!-- JS libs -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+      toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: "toast-top-right",
+        preventDuplicates: true,
+        timeOut: 2500,
+      };
+
+      let isRepoToLive = true;
+      let currentLang = "en";
+      let convertedLinksList = [];
+
+      const texts = {
+        en: {
+          title: "GitHub Link Converter",
+          inputLabel:
+            "Enter GitHub Repository or Live Links (comma separated):",
+          placeholder:
+            "e.g. https://github.com/username/repo1, https://username.github.io/repo2/",
+          convertBtn: "Convert Links",
+          swapBtn: "Swap Repo/Live",
+          downloadCsvBtn: "Download Converted Links as CSV",
+          copyBtn: "Copy",
+          copied: "Copied!",
+          invalidRepo: "Invalid GitHub repository link format.",
+          invalidLive: "Invalid GitHub live link format.",
+          emptyInput: "Please enter at least one link.",
+          shareText: "Share my GitHub:",
+        },
+        bn: {
+          title: "গিটহাব লিংক কনভার্টার",
+          inputLabel:
+            "গিটহাব রিপোজিটরি বা লাইভ লিংকগুলো লিখুন (কমা দিয়ে আলাদা করুন):",
+          placeholder:
+            "যেমন: https://github.com/username/repo1, https://username.github.io/repo2/",
+          convertBtn: "কনভার্ট করুন",
+          swapBtn: "রিপো/লাইভ স্যুইচ করুন",
+          downloadCsvBtn: "কনভার্টেড লিংক CSV ডাউনলোড করুন",
+          copyBtn: "কপি",
+          copied: "কপি হয়েছে!",
+          invalidRepo: "ভুল গিটহাব রিপোজিটরি লিংক।",
+          invalidLive: "ভুল গিটহাব লাইভ লিংক।",
+          emptyInput: "কমপক্ষে একটি লিংক লিখুন।",
+          shareText: "আমার গিটহাব শেয়ার করুন:",
+        },
+      };
+
+      const inputLinks = document.getElementById("inputLinks");
+      const inputLabel = document.getElementById("inputLabel");
+      const convertBtn = document.getElementById("convertBtn");
+      const swapBtn = document.getElementById("swapBtn");
+      const downloadCsvBtn = document.getElementById("downloadCsvBtn");
+      const output = document.getElementById("output");
+      const langSelect = document.getElementById("langSelect");
+      const themeToggle = document.getElementById("themeToggle");
+
+      const repoRegex = /^https?:\/\/github\.com\/([\w-]+)\/([\w-]+)$/i;
+      const liveRegex = /^https?:\/\/([\w-]+)\.github\.io\/([\w-]+)\/?$/i;
+
+      function updateLabels() {
+        const t = texts[currentLang];
+        inputLabel.textContent = isRepoToLive
+          ? currentLang === "bn"
+            ? "গিটহাব রিপোজিটরি লিংক দিন (কমা দিয়ে আলাদা করলে একাধিক হবে):"
+            : "Enter GitHub Repository Links (comma separated):"
+          : currentLang === "bn"
+          ? "লাইভ লিংক দিন (কমা দিয়ে আলাদা করলে একাধিক হবে):"
+          : "Enter GitHub Live Links (comma separated):";
+        inputLinks.placeholder = isRepoToLive
+          ? currentLang === "bn"
+            ? "যেমন: https://github.com/username/repo1, https://github.com/username/repo2"
+            : "e.g. https://github.com/username/repo1, https://github.com/username/repo2"
+          : currentLang === "bn"
+          ? "যেমন: https://username.github.io/repo1/, https://username.github.io/repo2/"
+          : "e.g. https://username.github.io/repo1/, https://username.github.io/repo2/";
+        convertBtn.textContent = t.convertBtn;
+        swapBtn.textContent = t.swapBtn;
+        downloadCsvBtn.textContent = t.downloadCsvBtn;
+      }
+
+      function copyToClipboard(text) {
+        if (!navigator.clipboard) {
+          alert("Copy not supported");
+          return;
+        }
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            toastr.success(texts[currentLang].copied);
+          })
+          .catch(() => {
+            toastr.error("Copy failed");
+          });
+      }
+
+      async function fetchAndShowUserData(username, container) {
+        try {
+          const res = await fetch(`https://api.github.com/users/${username}`);
+          if (!res.ok) throw new Error("User not found");
+          const user = await res.json();
+
+          const userDiv = document.createElement("div");
+          userDiv.className = "user-info";
+
+          const avatar = document.createElement("img");
+          avatar.src = user.avatar_url;
+          avatar.alt = user.login;
+          userDiv.appendChild(avatar);
+
+          const info = document.createElement("div");
+          info.innerHTML = `
+          <strong>${user.name || user.login}</strong>
+          <small>${user.bio || "No bio available"}</small>
+          <small>Repos: ${user.public_repos} | Followers: ${
+            user.followers
+          }</small>
+        `;
+          userDiv.appendChild(info);
+
+          container.appendChild(userDiv);
+        } catch (error) {
+          const errMsg = document.createElement("div");
+          errMsg.style.color = "#ff5555";
+          errMsg.style.marginTop = "6px";
+          errMsg.textContent = "User info not available";
+          container.appendChild(errMsg);
+        }
+      }
+
+      async function createLinkRow(url) {
+        const div = document.createElement("div");
+        div.className = "link-row";
+
+        const leftDiv = document.createElement("div");
+        leftDiv.className = "link-left";
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = url;
+
+        leftDiv.appendChild(link);
+
+        if (repoRegex.test(url)) {
+          try {
+            const [, user, repo] = url.match(repoRegex);
+            const apiUrl = `https://api.github.com/repos/${user}/${repo}`;
+            const res = await fetch(apiUrl);
+            if (!res.ok) throw new Error("API error");
+            const data = await res.json();
+
+            const preview = document.createElement("div");
+            preview.className = "preview-info";
+            preview.innerHTML = `
+            <strong>${data.full_name}</strong><br>
+            ⭐ ${data.stargazers_count} &nbsp;&nbsp; | &nbsp;&nbsp;
+            🍴 ${data.forks_count} <br>
+            ${data.description ? data.description : ""}
+          `;
+            leftDiv.appendChild(preview);
+          } catch (e) {
+            const preview = document.createElement("div");
+            preview.className = "preview-info";
+            preview.textContent = "Preview not available";
+            leftDiv.appendChild(preview);
+          }
+        } else if (liveRegex.test(url)) {
+          const preview = document.createElement("div");
+          preview.className = "preview-info";
+          preview.textContent =
+            currentLang === "bn" ? "লাইভ সাইট লিংক" : "Live site link";
+          leftDiv.appendChild(preview);
+        }
+
+        // Get username from URL
+        let username = null;
+        const repoMatch = url.match(
+          /^https?:\/\/github\.com\/([\w-]+)\/([\w-]+)$/i
+        );
+        const liveMatch = url.match(
+          /^https?:\/\/([\w-]+)\.github\.io\/([\w-]+)\/?$/i
+        );
+        if (repoMatch) username = repoMatch[1];
+        else if (liveMatch) username = liveMatch[1];
+
+        if (username) {
+          await fetchAndShowUserData(username, leftDiv);
+        }
+
+        div.appendChild(leftDiv);
+
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "copy-btn";
+        copyBtn.textContent = texts[currentLang].copyBtn;
+        copyBtn.onclick = () => copyToClipboard(url);
+        div.appendChild(copyBtn);
+
+        const qrDiv = document.createElement("div");
+        qrDiv.id = "qr-container";
+        div.appendChild(qrDiv);
+
+        QRCode.toCanvas(
+          qrDiv,
+          url,
+          { width: 100, margin: 1 },
+          function (error) {
+            if (error) console.error(error);
+          }
+        );
+
+        return div;
+      }
+
+      function clearOutput() {
+        output.innerHTML = "";
+        convertedLinksList = [];
+      }
+
+      async function convertLinks() {
+        clearOutput();
+
+        const rawText = inputLinks.value.trim();
+        if (!rawText) {
+          toastr.error(texts[currentLang].emptyInput);
+          return;
+        }
+
+        const links = rawText
+          .split(",")
+          .map((l) => l.trim())
+          .filter((l) => l.length > 0);
+
+        if (links.length === 0) {
+          toastr.error(texts[currentLang].emptyInput);
+          return;
+        }
+
+        let errorFound = false;
+        for (const link of links) {
+          let newLink = null;
+
+          if (isRepoToLive) {
+            const m = link.match(repoRegex);
+            if (m) {
+              const username = m[1];
+              const reponame = m[2];
+              newLink = `https://${username}.github.io/${reponame}/`;
+            } else {
+              errorFound = true;
+              const errDiv = document.createElement("div");
+              errDiv.style.color = "red";
+              errDiv.textContent = `${link} - ${texts[currentLang].invalidRepo}`;
+              output.appendChild(errDiv);
+              continue;
+            }
+          } else {
+            const m = link.match(liveRegex);
+            if (m) {
+              const username = m[1];
+              const reponame = m[2];
+              newLink = `https://github.com/${username}/${reponame}`;
+            } else {
+              errorFound = true;
+              const errDiv = document.createElement("div");
+              errDiv.style.color = "red";
+              errDiv.textContent = `${link} - ${texts[currentLang].invalidLive}`;
+              output.appendChild(errDiv);
+              continue;
+            }
+          }
+
+          if (newLink) {
+            const row = await createLinkRow(newLink);
+            output.appendChild(row);
+            convertedLinksList.push(newLink);
+          }
+        }
+
+        if (errorFound) {
+          output.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+
+      function downloadCSV() {
+        if (convertedLinksList.length === 0) {
+          toastr.warning("No converted links to download!");
+          return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Link\n";
+        convertedLinksList.forEach((link) => {
+          csvContent += `"${link}"\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "converted_links.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      function autoDetectAndSwap() {
+        const rawText = inputLinks.value.trim();
+        if (!rawText) return;
+
+        const firstLink = rawText.split(",")[0].trim();
+
+        if (repoRegex.test(firstLink) && !isRepoToLive) {
+          isRepoToLive = true;
+          updateLabels();
+        } else if (liveRegex.test(firstLink) && isRepoToLive) {
+          isRepoToLive = false;
+          updateLabels();
+        }
+      }
+
+      langSelect.addEventListener("change", (e) => {
+        currentLang = e.target.value;
+        updateLabels();
+      });
+
+      themeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+        themeToggle.textContent = document.body.classList.contains("dark")
+          ? "☀️"
+          : "🌙";
+      });
+
+      inputLinks.addEventListener("input", autoDetectAndSwap);
+
+      convertBtn.addEventListener("click", convertLinks);
+
+      swapBtn.addEventListener("click", () => {
+        isRepoToLive = !isRepoToLive;
+        updateLabels();
+      });
+
+      downloadCsvBtn.addEventListener("click", downloadCSV);
+
+      updateLabels();
+    </script>
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   </body>
 </html>
